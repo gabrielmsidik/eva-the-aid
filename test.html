@@ -1,15 +1,29 @@
-<button onclick="start()">Start</button>
+<button id="c" onclick="go()">Start</button>
 <input type="text" id='a' />
 <button value="submit" onclick=dummy() />
+<button onclick="end()">Stop</button>
 
 <body id='b'>
 
 </body>
 <br />
 
+
 <!-- <button onclick="stop()">Stop</button> -->
 
 <script>
+    check = false;
+
+    function go() {
+        check = true
+        recognition.start();
+    }
+
+    function end() {
+        check = false
+        recognition.stop();
+        processRecords();
+    }
 
     window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -198,7 +212,6 @@
         //     //put it here
         // }
     }
-    recognition.addEventListener('end', recognition.start);
     // recognition.onspeechend = function () {
     //     recognition.stop()
     //     recognition.start()
@@ -206,14 +219,30 @@
     //     // recognition.start();//start to always listen
     // }
 
-    function start() {
-        console.log("start");
+    recognition.addEventListener('end', () => {
+        if (check) {
+            recognition.start()
+        }
+    });
 
-        recognition.start();
-    }
+    
 
     function enterInput(el) {
         console.log(el.textContent);
     }
 
+    function processRecords() {
+        b = document.querySelector("#b").querySelectorAll("p");
+        texts = [];
+        console.log(b);
+        if (b == null) {
+            return
+        }
+        for(let i in b) {
+            texts.push(b[i].textContent);
+        }
+        n = document.createElement("p")
+        n.textContent = JSON.stringify(texts);
+        document.querySelector("#d").appendChild(n);
+    }
 </script>
