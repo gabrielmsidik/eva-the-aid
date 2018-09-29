@@ -1,6 +1,7 @@
 <button onclick="start()">Start</button>
 <input type="text" id='a' />
 <button value="submit" onclick=dummy() />
+
 <body id='b'>
 
 </body>
@@ -11,14 +12,19 @@
 <script>
 
     window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
     const recognition = new SpeechRecognition();
-    recognition.interimResults = true;
+
+    recognition.interimResults = false;
     recognition.lang = 'en-US';
+    recognition.maxAlternatives = 10;
 
     function dummy() {
+
         let transcript = document.getElementById("a").value
         console.log(transcript)
         transcript = transcript.toLowerCase();
+
         if (transcript.toLowerCase().search("eva") >= 0) {
             let intents = processSpeech(transcript);
             processIntent(intents, transcript);
@@ -26,16 +32,20 @@
     }
 
     function processIntent(intents, transcript) {
+
         let body = document.querySelector("#b");
         let p = document.createElement("p");
         let dt = new Date();
+
         p.textContent = dt.toUTCString() + " " + transcript;
         console.log(p);
         body.appendChild(p);
     }
 
     function processSpeech(speech) {
+
         console.log("processing speech... ")
+
         keywords = new Map(
             [['blood pressure', 'bp'],
             ['sugar level', 'sl']]);
@@ -51,23 +61,142 @@
 
     }
 
-    recognition.onresult = (e) => {
-        let transcript = Array.from(e.results)
-            .map(result => result[0])
-            .map(result => result.transcript)
-            .join('')
-        if (e.results[0].isFinal) {
-            if (transcript.toLowerCase().search("eva")) {
-                processSpeech(transcript.toLowerCase());
-                transcript = transcript.toLowerCase();
-                if (transcript.toLowerCase().search("eva") >= 0) {
-                    let intents = processSpeech(transcript);
-                    processIntent(intents, transcript);
+    let keywords = {
+        'airway': [
+            'airway',
+            'area',
+            "weigh",
+            'Airy',
+            'erica',
+            'erika'
+        ],
+        'clear': [
+            'clear',
+
+        ],
+        'patient': [
+            'patient',
+            'yishun',
+            'bishan',
+            'patience',
+            'patients',
+            'patent',
+            'oceanside'
+        ],
+        'breathing': [
+            'breathing','grieving','leaving','reading','weaving'
+        ],
+        'radial': [
+            'radial',
+            'radio',
+            'reno'
+        ],
+        'blood pressure': [
+            'blood pressure',
+            'bp',
+        ],
+        'blood': [
+            'blood'
+        ],
+        'pressure': [
+            'pressure'
+        ],
+        'arrived': [
+            'arrived',
+            'reached',
+            'arrival'
+        ],
+        'rapid': [
+            'rapid',
+            'very fast',
+            'rapidly',
+            'rabbit'
+        ],
+        'normal': [
+            'normal'
+        ],
+        'pulse': [
+            'pulse',
+            'piles'
+        ],
+        'slow': [
+            'slow'
+        ],
+        'present': [
+            'president',
+            'presents',
+            'presence'
+        ]
+    }
+
+    function processSpeechResults(recognitionResult) {
+
+        possible_transcripts = []
+
+        for(let alternativeIndex = 0; alternativeIndex < recognitionResult.length; alternativeIndex++) {
+            // console.log(recognitionResult[alternativeIndex].transcript)
+            possible_transcripts[alternativeIndex] = recognitionResult[alternativeIndex].transcript
+        }
+
+        detected_words = []
+        possible_transcripts.forEach( 
+            function(transcript) {
+                words = transcript.split(' ')
+                detected_words.push(...words)
+            }
+        )
+        console.log(detected_words)
+
+        detected_keywords = new Set()
+
+        detected_words.forEach(
+            function(word) {
+                word = word.toLowerCase()
+                for (let idx in keywords) {
+                    if (keywords[idx].includes(word)) {
+                        console.log(word)
+                        detected_keywords.add(idx)
+                    }
                 }
             }
-            console.log(transcript);
-            //put it here
+        )
+
+        console.log(detected_keywords)
+
+
+        
+    }
+    recognition.onresult = (e) => {
+        console.log('Obtained Results')
+
+        results = e.results;
+
+        for(let index = 0; index < results.length; index++) {
+            speechRecognitionResultObject = results
+            // console.log(results)
+
+            recognitionResult = results[0]
+            // console.log(recognitionResult)
+            processSpeechResults(recognitionResult)
+            
         }
+
+        // let transcript = Array.from(e.results)
+        //     .map(result => result[0])
+        //     .map(result => result.transcript)
+        //     .join('')
+        // if (e.results[0].isFinal) {
+        //     if (transcript.toLowerCase().search("eva")) {
+        //         processSpeech(transcript.toLowerCase());
+        //         transcript = transcript.toLowerCase();
+        //         if (transcript.toLowerCase().search("eva") >= 0) {
+        //             let intents = processSpeech(transcript);
+        //             processIntent(intents, transcript);
+        //         }
+        //     }
+        //     console.log(transcript);
+        //     //put it here
+        // }
     }
     recognition.addEventListener('end', recognition.start);
     // recognition.onspeechend = function () {
