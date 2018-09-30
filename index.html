@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>E.V.A</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+
+<body class="container ">
+    <div class="center">
+        <button class="btn green" id="c" onclick="go()">Start</button>
+        <button class="btn red" onclick="end()">Stop</button>
+    </div>
+    <div class="row">
+        <div class="col s3"></div>
+        <div class="col s6">
+            <div id='b'>
+
+            </div>
+            <br />
+            <div id='d'>
+
+            </div>
+        </div>
+        <div class="col s3"></div>
+    </div>
+
+</body>
+
+</html>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+    check = false;
+    tabs = "    "
+
+    function go() {
+        check = true
+        console.log("start")
+        recognition.start();
+    }
+
+    function end() {
+        check = false
+        console.log("stop")
+        recognition.stop();
+    }
+
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const recognition = new SpeechRecognition();
+
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    recognition.maxAlternatives = 10;
+    console.log(recognition);
+    function dummy() {
+
+        let transcript = document.getElementById("a").value
+        console.log(transcript)
+        transcript = transcript.toLowerCase();
+
+        if (transcript.toLowerCase().search("eva") >= 0) {
+            let intents = processSpeech(transcript);
+            processIntent(intents, transcript);
+        }
+    }
+
+    function processIntent(intents, transcript) {
+
+        let body = document.querySelector("#b");
+        let p = document.createElement("p");
+        let dt = new Date() + date.getTimezoneOffset() * 60000;
+
+        p.textContent = dt.toDateString() + " " + transcript;
+        console.log(p);
+        body.appendChild(p);
+    }
+
+    function processSpeech(speech) {
+
+        console.log("processing speech... ")
+
+        keywords = new Map(
+            [['blood pressure', 'bp'],
+            ['sugar level', 'sl']]);
+
+        let l = []
+        keywords.forEach((value, key, map) => {
+            if (speech.search(key) > 0) {
+                console.log("speech registered:", speech)
+                l.push(value);
+            }
+        })
+        return l;
+
+    }
+
+    let keywords = {
+        'airway': [
+            'airway',
+            'area',
+            "weigh",
+            'Airy',
+            'erica',
+            'erika'
+        ],
+        'clear': [
+            'clear',
+
+        ],
+        'patient': [
+            'patient',
+            'yishun',
+            'bishan',
+            'patience',
+            'patients',
+            'patent',
+            'oceanside'
+        ],
+        'breathing': [
+            'breathing', 'grieving', 'leaving', 'reading', 'weaving'
+        ],
+        'radial': [
+            'radial',
+            'radio',
+            'reno'
+        ],
+        'blood pressure': [
+            'blood pressure',
+            'bp',
+        ],
+        'blood': [
+            'blood'
+        ],
+        'pressure': [
+            'pressure'
+        ],
+        'arrived': [
+            'arrived',
+            'reached',
+            'arrival'
+        ],
+        'rapid': [
+            'rapid',
+            'very fast',
+            'rapidly',
+            'rabbit'
+        ],
+        'normal': [
+            'normal'
+        ],
+        'pulse': [
+            'pulse',
+            'piles'
+        ],
+        'slow': [
+            'slow'
+        ],
+        'present': [
+            'president',
+            'presents',
+            'presence'
+        ]
+    }
+
+    function processSpeechResults(recognitionResult) {
+
+        possible_transcripts = []
+
+        for (let alternativeIndex = 0; alternativeIndex < recognitionResult.length; alternativeIndex++) {
+            // console.log(recognitionResult[alternativeIndex].transcript)
+            possible_transcripts[alternativeIndex] = recognitionResult[alternativeIndex].transcript
+        }
+
+        detected_keywords = new Set();
+        transcripts_with_detected_keywords = [];
+        detected_words = new Set();
+        possible_transcripts.forEach(
+            function (transcript) {
+                count = 0
+                words = transcript.split(' ')
+                detected_words.add(...words)
+                for (let idx in keywords) {
+                    if (words.includes(idx)) {
+                        count += 1
+                        detected_keywords.add(idx)
+                    }
+                }
+                if (count > 0) {
+                    transcripts_with_detected_keywords.push([transcript, count]);
+                }
+            }
+        )
+        console.log(detected_words)
+
+        console.log(detected_keywords)
+
+        console.log("HELLO")
+        console.log(transcripts_with_detected_keywords)
+        console.log(detected_keywords)
+        console.log(detected_keywords.size)
+        console.log('Before entering if-loop on line 197')
+
+        let div = document.createElement("div");
+        let div1 = document.createElement("div");
+        let div2 = document.createElement("div");
+        let strong = document.createElement("strong");
+        let dt = new Date();
+
+        if (detected_keywords.size > 0) {
+            to_display = 0;
+            keyword_count = transcripts_with_detected_keywords[0][1];
+            for (let t in transcripts_with_detected_keywords.slice(0, 4)) {
+                para = document.createElement("li")
+                para.textContent += transcripts_with_detected_keywords[t][0] + " (" + transcripts_with_detected_keywords[t][1] + " keywords detected)";
+                div2.appendChild(para);
+                if (transcripts_with_detected_keywords[t][1] > keyword_count) {
+                    to_display = t;
+                    keyword_count = transcripts_with_detected_keywords[t][1];
+                }
+            }
+
+            strong.textContent = dt.toLocaleString() + " - " + transcripts_with_detected_keywords[to_display][0];
+
+        } else {
+            strong.textContent = dt.toLocaleString() + " - No keywords detected - Probable Lines\n"
+            possible_transcripts.slice(0, 4).forEach((t) => {
+                para = document.createElement("li")
+                para.textContent += tabs + t + "\n";
+                div2.appendChild(para);
+            })
+        }
+        div1.appendChild(strong);
+        div.appendChild(div1);
+        div.appendChild(div2);
+        document.querySelector("#b").appendChild(document.createElement("br"));
+        document.querySelector("#b").appendChild(div);
+
+    }
+    recognition.onresult = (e) => {
+        console.log('Obtained Results')
+
+        results = e.results;
+
+        for (let index = 0; index < results.length; index++) {
+            speechRecognitionResultObject = results
+            // console.log(results)
+
+            recognitionResult = results[0]
+            // console.log(recognitionResult)
+            processSpeechResults(recognitionResult)
+
+        }
+
+        // let transcript = Array.from(e.results)
+        //     .map(result => result[0])
+        //     .map(result => result.transcript)
+        //     .join('')
+        // if (e.results[0].isFinal) {
+        //     if (transcript.toLowerCase().search("eva")) {
+        //         processSpeech(transcript.toLowerCase());
+        //         transcript = transcript.toLowerCase();
+        //         if (transcript.toLowerCase().search("eva") >= 0) {
+        //             let intents = processSpeech(transcript);
+        //             processIntent(intents, transcript);
+        //         }
+        //     }
+        //     console.log(transcript);
+        //     //put it here
+        // }
+    }
+    // recognition.onspeechend = function () {
+    //     recognition.stop()
+    //     recognition.start()
+    //     console.log("here")
+    //     // recognition.start();//start to always listen
+    // }
+
+    recognition.addEventListener('end', () => {
+        if (check) {
+            recognition.start()
+        }
+    });
+
+
+
+    function enterInput(el) {
+        console.log(el.textContent);
+    }
+
+    
+</script>
