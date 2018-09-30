@@ -57,7 +57,7 @@
     recognition.interimResults = false;
     recognition.lang = 'en-US';
     recognition.maxAlternatives = 10;
-
+    console.log(recognition);
     function dummy() {
 
         let transcript = document.getElementById("a").value
