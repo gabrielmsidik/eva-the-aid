@@ -40,11 +40,13 @@
 
     function go() {
         check = true
+        console.log("start")
         recognition.start();
     }
 
     function end() {
         check = false
+        console.log("stop")
         recognition.stop();
     }
 
