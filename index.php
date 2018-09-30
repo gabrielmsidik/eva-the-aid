@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -74,7 +75,7 @@
 
         let body = document.querySelector("#b");
         let p = document.createElement("p");
-        let dt = new Date();
+        let dt = new Date() + date.getTimezoneOffset() * 60000;
 
         p.textContent = dt.toUTCString() + " " + transcript;
         console.log(p);
@@ -210,7 +211,8 @@
         let div1 = document.createElement("div");
         let div2 = document.createElement("div");
         let strong = document.createElement("strong");
-        let dt = new Date();
+        let date = new Date();
+        let dt = new Date(date.valueOf() + date.getTimezoneOffset() * 60000);
 
         if (detected_keywords.size > 0) {
             to_display = 0;
