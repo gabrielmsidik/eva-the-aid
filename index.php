@@ -77,7 +77,7 @@
         let p = document.createElement("p");
         let dt = new Date() + date.getTimezoneOffset() * 60000;
 
-        p.textContent = dt.toUTCString() + " " + transcript;
+        p.textContent = dt.toDateString() + " " + transcript;
         console.log(p);
         body.appendChild(p);
     }
@@ -211,8 +211,7 @@
         let div1 = document.createElement("div");
         let div2 = document.createElement("div");
         let strong = document.createElement("strong");
-        let date = new Date();
-        let dt = new Date(date.valueOf() + date.getTimezoneOffset() * 60000);
+        let dt = new Date();
 
         if (detected_keywords.size > 0) {
             to_display = 0;
@@ -227,10 +226,10 @@
                 }
             }
 
-            strong.textContent = dt.toUTCString() + " - " + transcripts_with_detected_keywords[to_display][0];
+            strong.textContent = dt.toLocaleString() + " - " + transcripts_with_detected_keywords[to_display][0];
 
         } else {
-            strong.textContent = dt.toUTCString() + " - No keywords detected - Probable Lines\n"
+            strong.textContent = dt.toLocaleString() + " - No keywords detected - Probable Lines\n"
             possible_transcripts.slice(0, 4).forEach((t) => {
                 para = document.createElement("li")
                 para.textContent += tabs + t + "\n";
