@@ -20,6 +20,7 @@
 
 <script>
     check = false;
+    tabs = "    "
 
     function go() {
         check = true
@@ -169,6 +170,7 @@
         console.log(detected_words)
 
         detected_keywords = new Set()
+        transcripts_with_detected_keywords = new Set()
 
         detected_words.forEach(
             function(word) {
@@ -177,12 +179,42 @@
                     if (keywords[idx].includes(word)) {
                         console.log(word)
                         detected_keywords.add(idx)
+                        for (let p in possible_transcripts) {
+                            if (possible_transcripts[p].search(word) >= 0) {
+                                transcripts_with_detected_keywords.add(possible_transcripts[p]);
+                            }
+                        }
                     }
                 }
             }
         )
 
         console.log(detected_keywords)
+        let div = document.createElement("div");
+        console.log("HELLO")
+        console.log(transcripts_with_detected_keywords)
+        console.log(detected_keywords)
+        console.log(detected_keywords.size)
+        console.log('Before entering if-loop on line 197')
+        if (detected_keywords.size > 0) {
+            div.textContent = "Lines with keywords\n"
+            transcripts_with_detected_keywords.forEach((t) => {
+                div.appendChild(document.createElement('t'))
+                para = document.createElement("div")
+                para.textContent += tabs + t + "\n";
+                div.appendChild(para);
+            })
+            document.querySelector("#b").appendChild(div);
+        } else {
+            div.textContent = "Probable Lines\n"
+            possible_transcripts.slice(0,4).forEach((t) => {
+                div.appendChild(document.createElement('t'))
+                para = document.createElement("div")
+                para.textContent += tabs + t + "\n";
+                div.appendChild(para);
+            })
+            document.querySelector("#b").appendChild(div);
+        }
 
 
         
